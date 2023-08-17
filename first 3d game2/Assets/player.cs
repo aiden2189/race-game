@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class player : MonoBehaviour
 {           
@@ -14,6 +16,9 @@ public class player : MonoBehaviour
     [SerializeField] Transform RLT;
     [SerializeField] Transform RRT;
 
+    public Slider EnginePower;
+    public TMP_Text speedomeder;
+
     public float enginePower = 150;
     public float BrakeForce = 100;
     public float maxSteer = 25; 
@@ -26,6 +31,13 @@ public class player : MonoBehaviour
     {
 
     }
+
+    public void enginepower()
+    {
+        enginePower = EnginePower.value;
+        speedomeder.text = EnginePower.value.ToString();
+    }
+
     // Update is called once per frame
     private void FixedUpdate()
     {
