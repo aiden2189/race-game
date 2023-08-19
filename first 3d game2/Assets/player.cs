@@ -165,6 +165,7 @@ public class player : MonoBehaviour
     public void UnStall()
     {
         Stall = 1;
+        StallText.SetActive(false);
         StopAllCoroutines();
     }
 }
