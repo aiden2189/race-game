@@ -16,12 +16,18 @@ public class player : MonoBehaviour
     [SerializeField] Transform RLT;
     [SerializeField] Transform RRT;
 
-    public Slider EnginePower;
+    public Transform mass;
+    public Rigidbody car;
+
     public TMP_Text speedomeder;
 
-    public float enginePower = 150;
+    public float enginePower = 0;
     public float BrakeForce = 100;
-    public float maxSteer = 25; 
+    public float maxSteer = 25;
+    public float maxSpeed;
+
+    public float Stall = 1;
+    public GameObject StallText;
 
     public float power = 0;
     public float brake = 0;
@@ -29,20 +35,14 @@ public class player : MonoBehaviour
 
     void Start()
     {
-
-    }
-
-    public void enginepower()
-    {
-        enginePower = EnginePower.value;
-        speedomeder.text = EnginePower.value.ToString();
+        car.centerOfMass = mass.localPosition;
     }
 
     // Update is called once per frame
     private void FixedUpdate()
     {
         //movement code
-        power = Input.GetAxis("Vertical") * enginePower;
+        power = Input.GetAxis("Vertical") * enginePower * Stall;
         steer = Input.GetAxis("Horizontal") * maxSteer;
         brake = Input.GetKey("space") ? GetComponent<Rigidbody>().mass * 0.5f : 0;
 
@@ -75,6 +75,9 @@ public class player : MonoBehaviour
         UpdateWheel(FRW, FRT);
         UpdateWheel(RLW, RLT);
         UpdateWheel(RRW, RRT);
+        
+        GetComponent<Rigidbody>().velocity = Vector3.ClampMagnitude(GetComponent<Rigidbody>().velocity, maxSpeed);
+
     }
 
     void UpdateWheel(WheelCollider col, Transform trans)
@@ -85,6 +88,84 @@ public class player : MonoBehaviour
 
         trans.position = position;
         trans.rotation = rotation;
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown("1"))
+        {
+            enginePower = 100;
+            maxSpeed = 3;
+            IsStall();
+        }
+
+        if (Input.GetKeyDown("2"))
+        {
+            enginePower = 500;
+            maxSpeed = 10;
+            IsStall();
+        }
+        
+        if (Input.GetKeyDown("3"))
+        {
+            enginePower = 1500;
+            maxSpeed = 50;
+            IsStall();
+        }
+
+        if (Input.GetKeyDown("4"))
+        {
+            enginePower = 5000;
+            maxSpeed = 100;
+            IsStall();
+        }
+
+        if (Input.GetKeyDown("5"))
+        {
+            enginePower = 1000000;
+            maxSpeed = 500;
+            IsStall();
+        }
+
+        if (Input.GetKeyDown("r"))
+        {
+            enginePower = -100;
+            IsStall();
+        }
+
+        if (Input.GetKeyDown("s"))
+        {
+            enginePower = 0;
+            UnStall();
+        }
+
+    }
+
+    IEnumerator SomeCoroutine()
+    {
+        WaitForSeconds wait = new WaitForSeconds(1f);         
+        for (int i = 0; i < 10; i++)
+        {
+            StallText.SetActive(false);
+            yield return wait;
+            StallText.SetActive(true); 
+            yield return wait; 
+        }
+    }
+
+    public void IsStall()
+    {
+        if(power > 0)
+        {
+            Stall = 0;
+            StartCoroutine(SomeCoroutine());  
+        }    
+    }
+    
+    public void UnStall()
+    {
+        Stall = 1;
+        StopAllCoroutines();
     }
 }
 
